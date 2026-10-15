@@ -1,0 +1,54 @@
+#ifndef ARVOREBE_HPP
+#define ARVOREBE_HPP
+
+#include "registro.hpp"
+#include "paginacao.hpp"
+
+#define M_BE  10     // ordem da página interna (índice)
+#define MM_BE M_BE       // ordem da página externa (folha)
+
+enum TipoIntExt { Interna, Externa };
+
+struct TipoPaginaBE;
+typedef TipoPaginaBE *TipoApontadorBE;
+
+struct TipoPaginaBE {
+    TipoIntExt pt;
+    union {
+        struct { // página interna (índice): só guarda chaves + ponteiros
+            int ni;
+            int chave[2 * M_BE];
+            TipoApontadorBE pi[2 * M_BE + 1];
+        } U0;
+        struct { // página externa (folha): guarda os registros completos
+            // +1: slot temporário para o (2M+1)-ésimo item, que entra na
+            // folha cheia só para, em seguida, ser imediatamente dividido
+            // (ver inserePaginaExterna / ins). Sem esse slot extra, inserir
+            // numa folha já com 2M itens escreve fora do array.
+            int ne;
+            TipoRegistro re[2 * MM_BE + 1];
+        } U1;
+    } UU;
+};
+
+// Pesquisa: sempre desce até uma página folha. Se achar a chave, devolve
+// (por meio de paginaAchada) a folha onde ela está.
+bool pesquisaArvoreBE(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estatisticas,
+                      TipoApontadorBE *paginaAchada);
+
+// Insere um registro, cuidando de divisão de página e crescimento da raiz.
+// Uso: ap = insere(reg, ap, &estatisticas);
+TipoApontadorBE insere(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estatisticas);
+void ins(TipoRegistro registro, TipoApontadorBE paginaAtual, bool *cresceu,
+         TipoRegistro *registroRetorno, TipoApontadorBE *paginaRetorno,
+         Estatisticas *estatisticas);
+void inserePaginaInterna(TipoApontadorBE ap, int chavePromovida, TipoApontadorBE apDir,
+                          Estatisticas *estatisticas);
+void inserePaginaExterna(TipoApontadorBE ap, TipoRegistro reg, Estatisticas *estatisticas);
+
+void imprimeArvoreBEstrela(TipoApontadorBE ap);
+void imprimirNo(TipoApontadorBE ap);
+
+void destruirArvoreBE(TipoApontadorBE ap);
+
+#endif // ARVOREBE_HPP

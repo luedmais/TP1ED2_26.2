@@ -1,22 +1,21 @@
-#define _POSIX_C_SOURCE 199309L
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
+#include <chrono>
 #include "arvoreBE.hpp"
 
 static unsigned long long agoraNs() {
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    return t.tv_sec * 1000000000ULL + t.tv_nsec;
+    return static_cast<unsigned long long>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count());
 }
 
-// ---------- INSERÇÃO ----------
+// ---------- INSERCAO ----------
 
 TipoApontadorBE insere(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estatisticas) {
     unsigned long long t_inicio = agoraNs();
     TipoApontadorBE raizFinal;
 
-    if (ap == NULL) { // primeira inserção: cria a raiz como folha
+    if (ap == NULL) { // primeira insercao: cria a raiz como folha
         TipoApontadorBE novaFolha = (TipoApontadorBE) malloc(sizeof(TipoPaginaBE));
         if (!novaFolha) exit(EXIT_FAILURE);
         novaFolha->pt = Externa;
@@ -30,14 +29,14 @@ TipoApontadorBE insere(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estat
 
         ins(reg, ap, &cresceu, &regRetorno, &apRetorno, estatisticas);
 
-        if (cresceu) { // divisão propagou até a raiz: cria nova raiz
+        if (cresceu) { // divisao propagou ate a raiz: cria nova raiz
             apTemp = (TipoApontadorBE) malloc(sizeof(TipoPaginaBE));
             if (!apTemp) exit(EXIT_FAILURE);
             apTemp->pt = Interna;
             apTemp->UU.U0.ni = 1;
             apTemp->UU.U0.chave[0] = regRetorno.chave;
             apTemp->UU.U0.pi[0] = ap;        // filho esquerdo = raiz antiga
-            apTemp->UU.U0.pi[1] = apRetorno; // filho direito = nova página
+            apTemp->UU.U0.pi[1] = apRetorno; // filho direito = nova pagina
             raizFinal = apTemp;
         } else {
             raizFinal = ap;
@@ -51,7 +50,7 @@ TipoApontadorBE insere(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estat
     return raizFinal;
 }
 
-// Insere um registro recursivamente em uma árvore B*.
+// Insere um registro recursivamente em uma arvore B*.
 void ins(TipoRegistro registro, TipoApontadorBE paginaAtual, bool *cresceu,
          TipoRegistro *registroRetorno, TipoApontadorBE *paginaRetorno,
          Estatisticas *estatisticas) {
@@ -70,7 +69,7 @@ void ins(TipoRegistro registro, TipoApontadorBE paginaAtual, bool *cresceu,
             return;
         }
 
-        // Página de índice cheia: divide em duas.
+        // Pagina de indice cheia: divide em duas.
         TipoApontadorBE apTemp = (TipoApontadorBE) malloc(sizeof(TipoPaginaBE));
         if (!apTemp) exit(EXIT_FAILURE);
         apTemp->pt = Interna;
@@ -95,7 +94,7 @@ void ins(TipoRegistro registro, TipoApontadorBE paginaAtual, bool *cresceu,
         *registroRetorno = regPromovido;
         *paginaRetorno = apTemp;
         *cresceu = true;
-    } else { // página externa (folha)
+    } else { // pagina externa (folha)
         i = 0;
         while (i < paginaAtual->UU.U1.ne && paginaAtual->UU.U1.re[i].chave < registro.chave) i++;
 
@@ -111,27 +110,25 @@ void ins(TipoRegistro registro, TipoApontadorBE paginaAtual, bool *cresceu,
         }
 
         // Folha cheia: insere (fica temporariamente com 2M+1 itens) e divide.
-        // Conforme o slide: a chave do meio é só COPIADA para o índice; o
-        // registro em si fica retido na folha da DIREITA (nova página).
         inserePaginaExterna(paginaAtual, registro, estatisticas);
 
         TipoApontadorBE apTemp = (TipoApontadorBE) malloc(sizeof(TipoPaginaBE));
         if (!apTemp) exit(EXIT_FAILURE);
         apTemp->pt = Externa;
         apTemp->UU.U1.ne = 0;
-        // Itens de M_BE..2*M_BE (M_BE+1 itens) vão para a folha da direita.
+        // Itens de M_BE..2*M_BE (M_BE+1 itens) vao para a folha da direita.
         for (int j = M_BE; j <= 2 * M_BE; j++) {
             inserePaginaExterna(apTemp, paginaAtual->UU.U1.re[j], estatisticas);
         }
-        paginaAtual->UU.U1.ne = M_BE; // folha esquerda fica só com 0..M_BE-1
-        *registroRetorno = apTemp->UU.U1.re[0]; // chave copiada para o índice
+        paginaAtual->UU.U1.ne = M_BE; // folha esquerda fica so com 0..M_BE-1
+        *registroRetorno = apTemp->UU.U1.re[0]; // chave copiada para o indice
         *cresceu = true;
         *paginaRetorno = apTemp;
     }
 }
 
 void inserePaginaExterna(TipoApontadorBE ap, TipoRegistro reg, Estatisticas *estatisticas) {
-    (void) estatisticas; // reservado: nenhuma comparação de pesquisa extra aqui
+    (void) estatisticas; // reservado: nenhuma comparacao de pesquisa extra aqui
     int k = ap->UU.U1.ne;
     while (k > 0 && reg.chave < ap->UU.U1.re[k - 1].chave) {
         ap->UU.U1.re[k] = ap->UU.U1.re[k - 1];
@@ -154,7 +151,7 @@ void inserePaginaInterna(TipoApontadorBE ap, int chavePromovida, TipoApontadorBE
     ap->UU.U0.ni++;
 }
 
-// ---------- IMPRESSÃO (debug) ----------
+// ---------- IMPRESSAO (debug) ----------
 
 void imprimeArvoreBEstrela(TipoApontadorBE ap) {
     if (ap == NULL) return;
@@ -203,7 +200,7 @@ bool pesquisaArvoreBE(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estati
     }
 }
 
-// ---------- DESTRUIÇÃO ----------
+// ---------- DESTRUICAO ----------
 
 void destruirArvoreBE(TipoApontadorBE ap) {
     if (ap == NULL) return;

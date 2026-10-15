@@ -5,27 +5,13 @@
 #include <cmath>
 
 #define ITENSPAGINA 100
-
-// Buffer de UMA página inteira do arquivo de dados. Só existe UMA instância
-// disso no programa inteiro (usada mais abaixo, na hora de ler a página onde
-// o item deve estar) -- não é o índice.
 struct PaginaIdx {
     TipoRegistro itens[ITENSPAGINA];
 };
 
-// Entrada do índice de páginas em memória principal: um par <chave, página>,
-// exatamente como descrito no slide "Acesso Sequencial Indexado" (índice
-// contém pares <x, p>, x = chave do 1º item da página, p = endereço da
-// página). Guardar só isso (e não a página inteira) é o que torna o método
-// viável: o índice fica muito menor que o arquivo de dados.
-// BUG CORRIGIDO: a versão anterior usava "PaginaIdx paginas[qntdPaginas]"
-// como índice, ou seja, alocava uma página inteira (100 itens x ~5KB cada)
-// para CADA entrada do índice, quando bastava guardar a chave e o número da
-// página. Para 2.000.000 de registros (maior caso de teste do TP) isso
-// chegava a reservar ~10 GB só para o índice, em vez de ~156 KB.
 struct EntradaIndice {
-    int chave;  // chave do 1º item da página
-    int pagina; // número da página (0-based) no arquivo de dados
+    int chave;  // chave do 1º item da pagina
+    int pagina; // numero da pagina (0-based) no arquivo de dados
 };
 
 void sequencial(const char *nomeArquivo, int qntdItens, int situacao, long chave,

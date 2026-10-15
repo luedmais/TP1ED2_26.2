@@ -1,0 +1,68 @@
+﻿TP1ED2 - Evidencias de testes
+Data: 2026-10-15 12:59:54
+
+===== m1_crescente =====
+----------------------------------------------
+Item encontrado
+Detalhes [chave=37, dado1=370, dado2=registro_37]
+----------------------------------------------
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 2 | comparacoes: 0 | tempo: 0.000000 s
+Pesquisa          -> transferencias: 1 | comparacoes: 38 | tempo: 0.000000 s
+
+===== m1_decrescente =====
+----------------------------------------------
+Item encontrado
+Detalhes [chave=37, dado1=370, dado2=registro_37]
+----------------------------------------------
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 2 | comparacoes: 0 | tempo: 0.000000 s
+Pesquisa          -> transferencias: 1 | comparacoes: 85 | tempo: 0.000000 s
+
+===== m1_invalido =====
+O acesso sequencial indexado so se aplica a arquivos ordenados (situacao 1 ou 2).
+
+===== m2_ausente =====
+Registro com chave 999 nao encontrado.
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 1096 | comparacoes: 856 | tempo: 0.000161 s
+Pesquisa          -> transferencias: 5 | comparacoes: 5 | tempo: 0.000015 s
+
+===== m2_crescente =====
+Registro com chave 37 encontrado.
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 7380 | comparacoes: 7140 | tempo: 0.000128 s
+Pesquisa          -> transferencias: 37 | comparacoes: 37 | tempo: 0.000123 s
+
+===== m3_ausente =====
+Registro com chave 999 nao encontrado.
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 2 | comparacoes: 719 | tempo: 0.000102 s
+Pesquisa          -> transferencias: 0 | comparacoes: 10 | tempo: 0.000000 s
+
+===== m3_crescente =====
+Registro encontrado: [chave=37, dado1=370, dado2=registro_37]
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 2 | comparacoes: 1092 | tempo: 0.000141 s
+Pesquisa          -> transferencias: 0 | comparacoes: 6 | tempo: 0.000001 s
+
+===== m4_ausente =====
+Registro com chave 999 nao encontrado.
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 2 | comparacoes: 0 | tempo: 0.000498 s
+Pesquisa          -> transferencias: 0 | comparacoes: 24 | tempo: 0.000000 s
+
+===== m4_crescente =====
+Registro com chave 37 encontrado (folha com 10 itens).
+
+--- Estatisticas ---
+Criacao do indice -> transferencias: 2 | comparacoes: 0 | tempo: 0.000540 s
+Pesquisa          -> transferencias: 0 | comparacoes: 9 | tempo: 0.000001 s
+

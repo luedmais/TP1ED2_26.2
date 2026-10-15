@@ -87,7 +87,8 @@ int main(int argc, char *argv[]) {
                 NoArvore no;
                 no.chave = pag.registros[i].chave;
                 no.dado1 = pag.registros[i].dado1;
-                strncpy(no.dado2, pag.registros[i].dado2, sizeof(no.dado2));
+                strncpy(no.dado2, pag.registros[i].dado2, sizeof(no.dado2) - 1);
+                no.dado2[sizeof(no.dado2) - 1] = '\0';
                 no.esquerda = no.direita = -1;
                 no.indice = pos;
                 fseek(arv, pos * sizeof(NoArvore), SEEK_SET);

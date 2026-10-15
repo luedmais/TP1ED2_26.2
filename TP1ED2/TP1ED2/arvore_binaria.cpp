@@ -4,7 +4,7 @@ static NoArvore lerNo(FILE *arquivo, int pos, int *acessos) {
     NoArvore no;
     fseek(arquivo, pos * sizeof(NoArvore), SEEK_SET);
     size_t lidos = fread(&no, sizeof(NoArvore), 1, arquivo);
-    (void)lidos; // Evita o warning de valor nao utilizado
+    (void)lidos; 
     (*acessos)++;
     return no;
 }

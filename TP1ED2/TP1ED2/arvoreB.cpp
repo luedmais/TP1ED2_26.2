@@ -10,10 +10,10 @@ int Pesquisa(TipoRegistro *x, TipoApontadorB Ap, Estatisticas *estatisticas) {
     int i = 1;
 
     if (Ap == NULL) {
-        return 0; // não encontrado
+        return 0; // nao encontrado
     }
 
-    // Avança sequencialmente até achar a posição onde a chave poderia estar.
+    // Avança sequencialmente ate achar a posicao onde a chave poderia estar.
     while (i < Ap->n && x->chave > Ap->r[i - 1].chave) {
         estatisticas->comparacoes++;
         i++;
@@ -43,7 +43,7 @@ void Imprime(TipoApontadorB Arvore) {
     }
 }
 
-// Insere um registro em uma página já existente (sem causar overflow), mantendo a ordenação.
+// Insere um registro em uma pagina ja existente (sem causar overflow), mantendo a ordenacao.
 static void InsereNaPagina(TipoApontadorB Ap, TipoRegistro Reg, TipoApontadorB ApDir) {
     int NaoAchouPosicao = (Ap->n > 0);
     int k = Ap->n;
@@ -64,14 +64,14 @@ static void InsereNaPagina(TipoApontadorB Ap, TipoRegistro Reg, TipoApontadorB A
     Ap->n++;
 }
 
-// Função recursiva que trata a inserção e as divisões de página.
+// Funcao recursiva que trata a insercao e as divisoes de pagina.
 static void Ins(TipoRegistro Reg, TipoApontadorB Ap, bool *Cresceu,
                 TipoRegistro *RegRetorno, TipoApontadorB *ApRetorno,
                 Estatisticas *estatisticas) {
     int i = 1, j;
     TipoApontadorB ApTemp;
 
-    if (Ap == NULL) { // caso base: posição de folha vazia encontrada
+    if (Ap == NULL) { // caso base: posicao de folha vazia encontrada
         *Cresceu = true;
         *RegRetorno = Reg;
         *ApRetorno = NULL;
@@ -95,13 +95,13 @@ static void Ins(TipoRegistro Reg, TipoApontadorB Ap, bool *Cresceu,
 
     if (!*Cresceu) return;
 
-    if (Ap->n < MM_B) { // página comporta o novo item
+    if (Ap->n < MM_B) { // pagina comporta o novo item
         InsereNaPagina(Ap, *RegRetorno, *ApRetorno);
         *Cresceu = false;
         return;
     }
 
-    // Página cheia: divide em duas.
+    // Pagina cheia: divide em duas.
     ApTemp = (TipoApontadorB) malloc(sizeof(TipoPaginaB));
     ApTemp->n = 0;
     ApTemp->p[0] = NULL;
@@ -131,7 +131,7 @@ void Insere(TipoRegistro Reg, TipoApontadorB *Ap, Estatisticas *estatisticas) {
 
     Ins(Reg, *Ap, &Cresceu, &RegRetorno, &ApRetorno, estatisticas);
 
-    if (Cresceu) { // a divisão propagou até a raiz: cria nova raiz
+    if (Cresceu) { // a divisao propagou ate a raiz: cria nova raiz
         ApTemp = (TipoApontadorB) malloc(sizeof(TipoPaginaB));
         ApTemp->n = 1;
         ApTemp->r[0] = RegRetorno;

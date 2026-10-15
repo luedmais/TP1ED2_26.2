@@ -3,7 +3,8 @@
 static NoArvore lerNo(FILE *arquivo, int pos, int *acessos) {
     NoArvore no;
     fseek(arquivo, pos * sizeof(NoArvore), SEEK_SET);
-    fread(&no, sizeof(NoArvore), 1, arquivo);
+    size_t lidos = fread(&no, sizeof(NoArvore), 1, arquivo);
+    (void)lidos; // Evita o warning de valor nao utilizado
     (*acessos)++;
     return no;
 }
@@ -48,7 +49,9 @@ int buscarNaArvore(int chave, FILE *arquivo, int *acessos, int *comparacoes) {
 
     while (1) {
         fseek(arquivo, pos * sizeof(NoArvore), SEEK_SET);
-        fread(&atual, sizeof(NoArvore), 1, arquivo);
+        size_t lidos = fread(&atual, sizeof(NoArvore), 1, arquivo);
+        if (lidos == 0) return -1; // Arquivo chegou ao fim ou falha na leitura
+        
         (*acessos)++;
         (*comparacoes)++;
 

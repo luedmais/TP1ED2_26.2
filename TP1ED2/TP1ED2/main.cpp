@@ -58,6 +58,9 @@ int main(int argc, char *argv[]) {
     Estatisticas estatIndice, estatBusca;
     iniciaEstatisticas(&estatIndice);
     iniciaEstatisticas(&estatBusca);
+    
+    // Variáveis para medir o tempo de processamento na memória RAM
+    struct timespec t_inicio, t_fim;
 
     switch (metodo) {
     case 1: { // Acesso sequencial indexado
@@ -76,19 +79,21 @@ int main(int argc, char *argv[]) {
         FILE *arv = fopen("arvore_binaria.bin", "wb+");
         if (!arv) { printf("Erro ao criar arvore_binaria.bin\n"); fclose(arquivo); return 1; }
 
-        TipoRegistro temp;
+        // CORREÇÃO: Utilizando a função de paginação em vez de fread unitário
+        PagReg pag;
         int pos = 0;
-        while (fread(&temp, sizeof(TipoRegistro), 1, arquivo) == 1 && pos < quantidade) {
-            NoArvore no;
-            no.chave = temp.chave;
-            no.dado1 = temp.dado1;
-            strncpy(no.dado2, temp.dado2, sizeof(no.dado2));
-            no.esquerda = no.direita = -1;
-            no.indice = pos;
-            fseek(arv, pos * sizeof(NoArvore), SEEK_SET);
-            fwrite(&no, sizeof(NoArvore), 1, arv);
-            pos++;
-            estatIndice.acessos++;
+        while (pos < quantidade && paginacao(arquivo, &pag, &estatIndice)) {
+            for (int i = 0; i < pag.quantidade && pos < quantidade; i++) {
+                NoArvore no;
+                no.chave = pag.registros[i].chave;
+                no.dado1 = pag.registros[i].dado1;
+                strncpy(no.dado2, pag.registros[i].dado2, sizeof(no.dado2));
+                no.esquerda = no.direita = -1;
+                no.indice = pos;
+                fseek(arv, pos * sizeof(NoArvore), SEEK_SET);
+                fwrite(&no, sizeof(NoArvore), 1, arv);
+                pos++;
+            }
         }
         fclose(arquivo);
 
@@ -98,7 +103,13 @@ int main(int argc, char *argv[]) {
         }
 
         rewind(arv);
+        
+        // CORREÇÃO: Contabilizar tempo de CPU para a pesquisa
+        clock_gettime(CLOCK_MONOTONIC, &t_inicio);
         int resultado = buscarNaArvore((int) chave, arv, &estatBusca.acessos, &estatBusca.comparacoes);
+        clock_gettime(CLOCK_MONOTONIC, &t_fim);
+        estatBusca.tempo += (t_fim.tv_sec - t_inicio.tv_sec) * 1000000000ULL + (t_fim.tv_nsec - t_inicio.tv_nsec);
+        
         printf(resultado != -1 ? "Registro com chave %ld encontrado.\n"
                                 : "Registro com chave %ld nao encontrado.\n", chave);
 
@@ -113,8 +124,6 @@ int main(int argc, char *argv[]) {
         TipoApontadorB Arvore;
         Inicializa(&Arvore);
 
-        // Le o arquivo pagina a pagina (TAM_PAG registros por vez), e cada
-        // pagina lida conta como 1 transferencia (ver paginacao.hpp).
         PagReg pag;
         int inseridos = 0;
         while (inseridos < quantidade && paginacao(arquivo, &pag, &estatIndice)) {
@@ -127,7 +136,14 @@ int main(int argc, char *argv[]) {
 
         TipoRegistro buscado;
         buscado.chave = (int) chave;
-        if (Pesquisa(&buscado, Arvore, &estatBusca)) {
+        
+        // CORREÇÃO: Contabilizar tempo de CPU para a pesquisa
+        clock_gettime(CLOCK_MONOTONIC, &t_inicio);
+        int achou = Pesquisa(&buscado, Arvore, &estatBusca);
+        clock_gettime(CLOCK_MONOTONIC, &t_fim);
+        estatBusca.tempo += (t_fim.tv_sec - t_inicio.tv_sec) * 1000000000ULL + (t_fim.tv_nsec - t_inicio.tv_nsec);
+
+        if (achou) {
             printf("Registro encontrado: [chave=%d, dado1=%ld, dado2=%s]\n",
                    buscado.chave, buscado.dado1, buscado.dado2);
         } else {
@@ -157,7 +173,14 @@ int main(int argc, char *argv[]) {
         TipoRegistro buscado;
         buscado.chave = (int) chave;
         TipoApontadorBE folha;
-        if (pesquisaArvoreBE(buscado, Arvore, &estatBusca, &folha)) {
+        
+        // CORREÇÃO: Contabilizar tempo de CPU para a pesquisa
+        clock_gettime(CLOCK_MONOTONIC, &t_inicio);
+        bool achou = pesquisaArvoreBE(buscado, Arvore, &estatBusca, &folha);
+        clock_gettime(CLOCK_MONOTONIC, &t_fim);
+        estatBusca.tempo += (t_fim.tv_sec - t_inicio.tv_sec) * 1000000000ULL + (t_fim.tv_nsec - t_inicio.tv_nsec);
+
+        if (achou) {
             printf("Registro com chave %ld encontrado (folha com %d itens).\n", chave, folha->UU.U1.ne);
         } else {
             printf("Registro com chave %ld nao encontrado.\n", chave);

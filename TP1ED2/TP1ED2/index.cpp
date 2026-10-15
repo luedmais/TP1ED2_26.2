@@ -1,5 +1,6 @@
 #include "registro.hpp"
 #include "index.hpp"
+#include <algorithm>
 #include <fstream>
 #include <cmath>
 #include <chrono>

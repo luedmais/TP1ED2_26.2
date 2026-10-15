@@ -1,6 +1,7 @@
-#include "Registro.hpp"
+#include "registro.hpp"
 #include "gerador_arquivo.hpp"
 
+#include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -9,7 +10,8 @@
 #include <random>
 #include <numeric>
 #include <cstring>
-#include "registro.hpp"
+
+namespace fs = std::filesystem;
 
 // Configuração de tamanho do lote para gravação rápida sem estourar a RAM
 constexpr int TAM_LOTE = 5000;
@@ -91,35 +93,24 @@ void gerarArquivos(const std::string& prefixo, int tipo, int quantidade) {
               << quantidade << " registros!\n";
 }
 
-int main() {
-    int tipo = 0;
-    int quantidade = 0;
-
-    std::cout << "Escolha o tipo de ordenacao:\n";
-    std::cout << "1 - Ordem crescente\n";
-    std::cout << "2 - Ordem decrescente\n";
-    std::cout << "3 - Ordem aleatoria\n";
-    std::cout << "Opcao: ";
-    std::cin >> tipo;
-
-    if (tipo < 1 || tipo > 3) {
-        std::cerr << "Opcao invalida!\n";
-        return 1;
-    }
-
-    std::cout << "Digite a quantidade de registros: ";
-    std::cin >> quantidade;
-
-    if (quantidade <= 0) {
-        std::cerr << "Quantidade invalida!\n";
-        return 1;
-    }
-
-    // Prefixo sugerido de acordo com a quantidade e a situação
-    std::string sufixo = (tipo == 1) ? "c" : (tipo == 2 ? "d" : "a");
-    std::string prefixo = "dados_" + std::to_string(quantidade) + "_" + sufixo;
-
-    gerarArquivos(prefixo, tipo, quantidade);
-
-    return 0;
+std::string GeradorArquivo::gerarNomeArquivo(int quantidade, int situacao) {
+    const std::string sufixo = situacao == 1 ? "c" : situacao == 2 ? "d" : "a";
+    return "dados_" + std::to_string(quantidade) + "_" + sufixo + ".bin";
 }
+
+bool GeradorArquivo::gerar(const std::string& nomeArquivo, int quantidade, int situacao) {
+    if (fs::exists(nomeArquivo)) {
+        std::cout << "[INFO] O arquivo " << nomeArquivo << " ja existe.\n";
+        return true;
+    }
+
+    const std::string prefixo = nomeArquivo.substr(0, nomeArquivo.size() - 4);
+    gerarArquivos(prefixo, situacao, quantidade);
+    return fs::exists(nomeArquivo);
+}
+
+bool GeradorArquivo::garantirArquivoExiste(int quantidade, int situacao) {
+    const std::string nomeArquivo = gerarNomeArquivo(quantidade, situacao);
+    return gerar(nomeArquivo, quantidade, situacao);
+}
+

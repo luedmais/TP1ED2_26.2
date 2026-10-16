@@ -6,7 +6,7 @@
 
 // TAM_PAG = quantidade de registros que cabem em uma "pagina" / moldura de pagina da memoria secundaria
 // Cada leitura de uma pagina inteira == 1 transferencia entre memoria secundaria e principal.
-#define TAM_PAG 100
+#define TAM_PAG 100dt
 
 typedef struct {
     TipoRegistro registros[TAM_PAG];

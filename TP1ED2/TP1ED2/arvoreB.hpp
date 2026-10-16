@@ -28,7 +28,4 @@ void Insere(TipoRegistro Reg, TipoApontadorB *Ap, Estatisticas *estatisticas);
 // Libera toda a memaria alocada pela arvore.
 void Limpar(TipoApontadorB *Ap);
 
-// Impressão em ordem (debug).
-void Imprime(TipoApontadorB Arvore);
-
 #endif // ARVOREB_HPP

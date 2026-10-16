@@ -151,30 +151,6 @@ void inserePaginaInterna(TipoApontadorBE ap, int chavePromovida, TipoApontadorBE
     ap->UU.U0.ni++;
 }
 
-// ---------- IMPRESSAO (debug) ----------
-
-void imprimeArvoreBEstrela(TipoApontadorBE ap) {
-    if (ap == NULL) return;
-
-    if (ap->pt == Interna) {
-        for (int i = 0; i < ap->UU.U0.ni; i++) {
-            imprimeArvoreBEstrela(ap->UU.U0.pi[i]);
-        }
-        imprimeArvoreBEstrela(ap->UU.U0.pi[ap->UU.U0.ni]);
-    } else {
-        for (int i = 0; i < ap->UU.U1.ne; i++) {
-            printf("%d ", ap->UU.U1.re[i].chave);
-        }
-    }
-}
-
-void imprimirNo(TipoApontadorBE ap) {
-    printf("\nIntervalo: \n|");
-    for (int i = 0; i < ap->UU.U1.ne; i++)
-        printf(" %d ", ap->UU.U1.re[i].chave);
-    printf("|\n");
-}
-
 // ---------- PESQUISA ----------
 
 bool pesquisaArvoreBE(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estatisticas, TipoApontadorBE *paginaAchada) {

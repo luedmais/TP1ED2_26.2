@@ -32,17 +32,6 @@ int Pesquisa(TipoRegistro *x, TipoApontadorB Ap, Estatisticas *estatisticas) {
     }
 }
 
-void Imprime(TipoApontadorB Arvore) {
-    if (Arvore != NULL) {
-        int i;
-        for (i = 0; i < Arvore->n; i++) {
-            Imprime(Arvore->p[i]);
-            printf("%d ", Arvore->r[i].chave);
-        }
-        Imprime(Arvore->p[i]);
-    }
-}
-
 // Insere um registro em uma pagina ja existente (sem causar overflow), mantendo a ordenacao.
 static void InsereNaPagina(TipoApontadorB Ap, TipoRegistro Reg, TipoApontadorB ApDir) {
     int NaoAchouPosicao = (Ap->n > 0);

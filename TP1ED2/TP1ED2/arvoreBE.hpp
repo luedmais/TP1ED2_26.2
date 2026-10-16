@@ -21,10 +21,6 @@ struct TipoPaginaBE {
             TipoApontadorBE pi[2 * M_BE + 1];
         } U0;
         struct { // pagina externa (folha): guarda os registros completos
-            // +1: slot temporario para o (2M+1)-esimo item, que entra na
-            // folha cheia so para, em seguida, ser imediatamente dividido
-            // (ver inserePaginaExterna / ins). Sem esse slot extra, inserir
-            // numa folha ja com 2M itens escreve fora do array.
             int ne;
             TipoRegistro re[2 * MM_BE + 1];
         } U1;
@@ -45,9 +41,6 @@ void ins(TipoRegistro registro, TipoApontadorBE paginaAtual, bool *cresceu,
 void inserePaginaInterna(TipoApontadorBE ap, int chavePromovida, TipoApontadorBE apDir,
                           Estatisticas *estatisticas);
 void inserePaginaExterna(TipoApontadorBE ap, TipoRegistro reg, Estatisticas *estatisticas);
-
-void imprimeArvoreBEstrela(TipoApontadorBE ap);
-void imprimirNo(TipoApontadorBE ap);
 
 void destruirArvoreBE(TipoApontadorBE ap);
 

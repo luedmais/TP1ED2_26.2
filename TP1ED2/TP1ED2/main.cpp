@@ -155,7 +155,9 @@ int main(int argc, char *argv[]) {
 
     case 4: { // Arvore B*
         FILE *arquivo = fopen(nomeArquivo.c_str(), "rb");
-        if (!arquivo) { printf("Erro ao abrir %s\n", nomeArquivo.c_str()); return 1; }
+        if (!arquivo) { 
+            printf("Erro ao abrir %s\n", nomeArquivo.c_str()); return 1;
+        }
 
         TipoApontadorBE Arvore = NULL;
 

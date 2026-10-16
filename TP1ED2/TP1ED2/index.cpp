@@ -27,7 +27,7 @@ void sequencial(const char *nomeArquivo, int qntdItens, int situacao, long chave
     int i = 0;
     TipoRegistro item;
 
-    // Monta o índice de páginas: guarda só o 1º item de cada página.
+    // Monta o indice de paginas: guarda so o 1º item de cada pagina.
     EntradaIndice *indice = (EntradaIndice *) calloc(qntdPaginas, sizeof(EntradaIndice));
     if (indice == NULL) {
         printf("Erro de memoria!\n");
@@ -87,9 +87,9 @@ void sequencial(const char *nomeArquivo, int qntdItens, int situacao, long chave
         return;
     }
 
-    // Lê a página completa onde o item deveria estar.
-    // (único buffer de página alocado no programa: reaproveitado aqui, e só
-    // aqui -- o índice acima não precisa dele.)
+    // Le a pagina completa onde o item deveria estar.
+    // (unico buffer de pagina alocado no programa: reaproveitado aqui, e so
+    // aqui -- o indice acima nao precisa dele.)
     PaginaIdx *pagina = (PaginaIdx *) malloc(sizeof(PaginaIdx));
     if (pagina == NULL) {
         printf("Erro de memoria!\n");

@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <chrono>
 #include <string>
 
 #include "registro.hpp"
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Garante que o arquivo de entrada exista (gera automaticamente se necessário).
+    // Garante que o arquivo de entrada exista (gera automaticamente se necessario).
     std::string nomeArquivo = garantirArquivoExiste(quantidade, situacao);
 
     if (mostrarChaves) {
@@ -59,8 +60,8 @@ int main(int argc, char *argv[]) {
     iniciaEstatisticas(&estatIndice);
     iniciaEstatisticas(&estatBusca);
     
-    // Variáveis para medir o tempo de processamento na memória RAM
-    struct timespec t_inicio, t_fim;
+    // Variaveis para medir o tempo de processamento na memoria RAM
+    std::chrono::steady_clock::time_point t_inicio, t_fim;
 
     switch (metodo) {
     case 1: { // Acesso sequencial indexado
@@ -79,7 +80,6 @@ int main(int argc, char *argv[]) {
         FILE *arv = fopen("arvore_binaria.bin", "wb+");
         if (!arv) { printf("Erro ao criar arvore_binaria.bin\n"); fclose(arquivo); return 1; }
 
-        // CORREÇÃO: Utilizando a função de paginação em vez de fread unitário
         PagReg pag;
         int pos = 0;
         while (pos < quantidade && paginacao(arquivo, &pag, &estatIndice)) {
@@ -105,11 +105,10 @@ int main(int argc, char *argv[]) {
 
         rewind(arv);
         
-        // CORREÇÃO: Contabilizar tempo de CPU para a pesquisa
-        clock_gettime(CLOCK_MONOTONIC, &t_inicio);
+        t_inicio = std::chrono::steady_clock::now();
         int resultado = buscarNaArvore((int) chave, arv, &estatBusca.acessos, &estatBusca.comparacoes);
-        clock_gettime(CLOCK_MONOTONIC, &t_fim);
-        estatBusca.tempo += (t_fim.tv_sec - t_inicio.tv_sec) * 1000000000ULL + (t_fim.tv_nsec - t_inicio.tv_nsec);
+        t_fim = std::chrono::steady_clock::now();
+        estatBusca.tempo += std::chrono::duration_cast<std::chrono::nanoseconds>(t_fim - t_inicio).count();
         
         printf(resultado != -1 ? "Registro com chave %ld encontrado.\n"
                                 : "Registro com chave %ld nao encontrado.\n", chave);
@@ -138,11 +137,10 @@ int main(int argc, char *argv[]) {
         TipoRegistro buscado;
         buscado.chave = (int) chave;
         
-        // CORREÇÃO: Contabilizar tempo de CPU para a pesquisa
-        clock_gettime(CLOCK_MONOTONIC, &t_inicio);
+        t_inicio = std::chrono::steady_clock::now();
         int achou = Pesquisa(&buscado, Arvore, &estatBusca);
-        clock_gettime(CLOCK_MONOTONIC, &t_fim);
-        estatBusca.tempo += (t_fim.tv_sec - t_inicio.tv_sec) * 1000000000ULL + (t_fim.tv_nsec - t_inicio.tv_nsec);
+        t_fim = std::chrono::steady_clock::now();
+        estatBusca.tempo += std::chrono::duration_cast<std::chrono::nanoseconds>(t_fim - t_inicio).count();
 
         if (achou) {
             printf("Registro encontrado: [chave=%d, dado1=%ld, dado2=%s]\n",
@@ -175,11 +173,10 @@ int main(int argc, char *argv[]) {
         buscado.chave = (int) chave;
         TipoApontadorBE folha;
         
-        // CORREÇÃO: Contabilizar tempo de CPU para a pesquisa
-        clock_gettime(CLOCK_MONOTONIC, &t_inicio);
+        t_inicio = std::chrono::steady_clock::now();
         bool achou = pesquisaArvoreBE(buscado, Arvore, &estatBusca, &folha);
-        clock_gettime(CLOCK_MONOTONIC, &t_fim);
-        estatBusca.tempo += (t_fim.tv_sec - t_inicio.tv_sec) * 1000000000ULL + (t_fim.tv_nsec - t_inicio.tv_nsec);
+        t_fim = std::chrono::steady_clock::now();
+        estatBusca.tempo += std::chrono::duration_cast<std::chrono::nanoseconds>(t_fim - t_inicio).count();
 
         if (achou) {
             printf("Registro com chave %ld encontrado (folha com %d itens).\n", chave, folha->UU.U1.ne);

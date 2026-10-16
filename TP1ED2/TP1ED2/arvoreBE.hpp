@@ -4,8 +4,8 @@
 #include "registro.hpp"
 #include "paginacao.hpp"
 
-#define M_BE  10     // ordem da página interna (índice)
-#define MM_BE M_BE       // ordem da página externa (folha)
+#define M_BE  10     // ordem da pagina interna (índice)
+#define MM_BE M_BE       // ordem da pagina externa (folha)
 
 enum TipoIntExt { Interna, Externa };
 
@@ -15,28 +15,28 @@ typedef TipoPaginaBE *TipoApontadorBE;
 struct TipoPaginaBE {
     TipoIntExt pt;
     union {
-        struct { // página interna (índice): só guarda chaves + ponteiros
+        struct { // pagina interna (indice): so guarda chaves + ponteiros
             int ni;
             int chave[2 * M_BE];
             TipoApontadorBE pi[2 * M_BE + 1];
         } U0;
-        struct { // página externa (folha): guarda os registros completos
-            // +1: slot temporário para o (2M+1)-ésimo item, que entra na
-            // folha cheia só para, em seguida, ser imediatamente dividido
+        struct { // pagina externa (folha): guarda os registros completos
+            // +1: slot temporario para o (2M+1)-esimo item, que entra na
+            // folha cheia so para, em seguida, ser imediatamente dividido
             // (ver inserePaginaExterna / ins). Sem esse slot extra, inserir
-            // numa folha já com 2M itens escreve fora do array.
+            // numa folha ja com 2M itens escreve fora do array.
             int ne;
             TipoRegistro re[2 * MM_BE + 1];
         } U1;
     } UU;
 };
 
-// Pesquisa: sempre desce até uma página folha. Se achar a chave, devolve
-// (por meio de paginaAchada) a folha onde ela está.
+// Pesquisa: sempre desce ate uma pagina folha. Se achar a chave, devolve
+// (por meio de paginaAchada) a folha onde ela esta.
 bool pesquisaArvoreBE(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estatisticas,
                       TipoApontadorBE *paginaAchada);
 
-// Insere um registro, cuidando de divisão de página e crescimento da raiz.
+// Insere um registro, cuidando de divisao de pagina e crescimento da raiz.
 // Uso: ap = insere(reg, ap, &estatisticas);
 TipoApontadorBE insere(TipoRegistro reg, TipoApontadorBE ap, Estatisticas *estatisticas);
 void ins(TipoRegistro registro, TipoApontadorBE paginaAtual, bool *cresceu,

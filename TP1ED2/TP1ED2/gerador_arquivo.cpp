@@ -25,7 +25,7 @@ std::string gerarNomeArquivo(int quantidade, int situacao) {
 std::string garantirArquivoExiste(int quantidade, int situacao) {
     std::string nomeArquivo = gerarNomeArquivo(quantidade, situacao);
     if (arquivoExiste(nomeArquivo)) {
-        return nomeArquivo; // já existe: não gera de novo
+        return nomeArquivo; // ja existe: nao gera de novo
     }
 
     std::ofstream arqBin(nomeArquivo, std::ios::binary);
@@ -42,12 +42,12 @@ std::string garantirArquivoExiste(int quantidade, int situacao) {
 
     if (situacao == 2) { // decrescente
         std::reverse(chaves.begin(), chaves.end());
-    } else if (situacao == 3) { // aleatório
+    } else if (situacao == 3) { // aleatorio
         std::random_device rd;
         std::mt19937 g(rd());
         std::shuffle(chaves.begin(), chaves.end(), g);
     }
-    // situacao == 1 (crescente): mantém 1..quantidade na ordem natural.
+    // situacao == 1 (crescente): mantem 1..quantidade na ordem natural.
 
     std::vector<TipoRegistro> lote;
     lote.reserve(TAM_LOTE);

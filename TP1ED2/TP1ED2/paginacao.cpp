@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 199309L
 #include <cstdio>
 #include <cstdlib>
+#include <chrono>
 #include <ctime>
 #include "paginacao.hpp"
 
@@ -29,11 +30,10 @@ bool fecharArquivo(FILE *arq) {
     return false;
 }
 
-// Lê até TAM_PAG registros em uma única operação de leitura (1 página = 1
-// transferência/acesso), mesmo que a última página do arquivo esteja incompleta.
+// Le ate TAM_PAG registros em uma unica operacao de leitura (1 pagina = 1
+// transferencia/acesso), mesmo que a ultima pagina do arquivo esteja incompleta.
 bool paginacao(FILE *arq, PagReg *pagina, Estatisticas *estatisticas) {
-    struct timespec t_inicio, t_fim;
-    clock_gettime(CLOCK_MONOTONIC, &t_inicio);
+    const auto t_inicio = std::chrono::steady_clock::now();
 
     size_t lidos = fread(pagina->registros, sizeof(TipoRegistro), TAM_PAG, arq);
     pagina->quantidade = (int) lidos;
@@ -42,9 +42,11 @@ bool paginacao(FILE *arq, PagReg *pagina, Estatisticas *estatisticas) {
         estatisticas->acessos++;
     }
 
-    clock_gettime(CLOCK_MONOTONIC, &t_fim);
-    estatisticas->time.inicio = t_inicio.tv_sec * 1000000000ULL + t_inicio.tv_nsec;
-    estatisticas->time.fim    = t_fim.tv_sec    * 1000000000ULL + t_fim.tv_nsec;
+    const auto t_fim = std::chrono::steady_clock::now();
+    estatisticas->time.inicio = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        t_inicio.time_since_epoch()).count();
+    estatisticas->time.fim = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        t_fim.time_since_epoch()).count();
     estatisticas->tempo += estatisticas->time.fim - estatisticas->time.inicio;
 
     return lidos > 0;
